@@ -76,16 +76,7 @@ This project follows Clean Architecture principles with the following layers:
 - `flutter_bloc`: State management
 - `cached_network_image`: Image caching
 - `photo_view`: Image zoom functionality
-- [Add other dependencies here]
 
-## CI/CD
-
-This project uses GitHub Actions for continuous integration and deployment. The workflow:
-- Runs on push to main branch and pull requests
-- Verifies code formatting
-- Runs static analysis
-- Executes tests
-- Builds release versions for Android and iOS
 
 ## Contributing
 
@@ -98,9 +89,5 @@ This project uses GitHub Actions for continuous integration and deployment. The 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-Drishtant Ranjan - [Your GitHub Profile](https://github.com/Drishtantranjan)
 
 Project Link: [https://github.com/Drishtantranjan/news_app](https://github.com/Drishtantranjan/news_app)
