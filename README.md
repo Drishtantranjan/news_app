@@ -99,8 +99,4 @@ This project uses GitHub Actions for continuous integration and deployment. The 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contact
-
-Drishtant Ranjan - [Your GitHub Profile](https://github.com/Drishtantranjan)
-
 Project Link: [https://github.com/Drishtantranjan/news_app](https://github.com/Drishtantranjan/news_app)
