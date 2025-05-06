@@ -3,57 +3,10 @@ import 'package:equatable/equatable.dart';
 import '../../domain/entities/news.dart';
 import '../../domain/repositories/news_repository.dart';
 import 'dart:collection';
+import 'news_list_event.dart';
+import 'news_list_state.dart';
 
-// Events
-abstract class NewsListEvent extends Equatable {
-  const NewsListEvent();
 
-  @override
-  List<Object> get props => [];
-}
-
-class LoadNews extends NewsListEvent {}
-class LoadMoreNews extends NewsListEvent {}
-
-// States
-abstract class NewsListState extends Equatable {
-  const NewsListState();
-
-  @override
-  List<Object> get props => [];
-}
-
-class NewsListInitial extends NewsListState {}
-
-class NewsListLoading extends NewsListState {}
-
-class NewsListLoaded extends NewsListState {
-  final List<News> news;
-  final bool hasReachedEnd;
-  final bool isLoadingMore;
-  final int apiCallCount;
-
-  const NewsListLoaded(
-    this.news, {
-    this.hasReachedEnd = false,
-    this.isLoadingMore = false,
-    this.apiCallCount = 0,
-  });
-
-  @override
-  List<Object> get props => [news, hasReachedEnd, isLoadingMore, apiCallCount];
-}
-
-class NewsListError extends NewsListState {
-  final String message;
-
-  const NewsListError(this.message);
-
-  @override
-  List<Object> get props => [message];
-}
-
-// Bloc
 class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
   final NewsRepository newsRepository;
   int _currentPage = 1;

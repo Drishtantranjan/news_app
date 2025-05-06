@@ -1,4 +1,7 @@
-// Events
+import 'package:equatable/equatable.dart';
+
+
+
 abstract class NewsListEvent extends Equatable {
   const NewsListEvent();
 

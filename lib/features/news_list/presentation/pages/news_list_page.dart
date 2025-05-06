@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../bloc/news_list_bloc.dart';
+import '../bloc/news_list_event.dart';
+import '../bloc/news_list_state.dart';
 import '../../../../shared/widgets/loading_indicator.dart';
 import '../../../../shared/widgets/error_view.dart';
 
@@ -65,7 +67,14 @@ class _NewsListPageState extends State<NewsListPage> {
           ),
         ],
       ),
-      body: BlocBuilder<NewsListBloc, NewsListState>(
+      body: BlocConsumer<NewsListBloc, NewsListState>(
+        listener: (context, state) {
+          if (state is NewsListError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+        },
         builder: (context, state) {
           if (state is NewsListInitial) {
             context.read<NewsListBloc>().add(LoadNews());
