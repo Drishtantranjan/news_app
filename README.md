@@ -12,10 +12,6 @@ A modern Flutter application that provides users with the latest news updates in
 - 🖼️ Cached image loading for better performance
 - 📊 API call tracking
 
-## Screenshots
-
-[Add your app screenshots here]
-
 ## Getting Started
 
 ### Prerequisites
