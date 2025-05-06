@@ -34,14 +34,30 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
 
     _apiCallCount++;
     final result = await newsRepository.getNews(page: _currentPage);
-    result.fold(
-      (failure) => emit(NewsListError(failure.message)),
+    await result.fold(
+      (failure) async => emit(NewsListError(failure.message)),
       (news) async {
         _allNews = news;
-        _hasReachedEnd = news.length < 3;
-        emit(NewsListLoaded(_allNews, hasReachedEnd: _hasReachedEnd, isLoadingMore: false, apiCallCount: _apiCallCount));
-        // Prefetch next page
-        await _prefetchNextPage();
+        _hasReachedEnd = news.isEmpty;
+        emit(NewsListLoaded(
+          _allNews,
+          hasReachedEnd: _hasReachedEnd,
+          isLoadingMore: false,
+          apiCallCount: _apiCallCount,
+        ));
+
+        if (!_hasReachedEnd) {
+          // Prefetch next page
+          await _prefetchNextPage();
+          if (!emit.isDone) {
+            emit(NewsListLoaded(
+              _allNews,
+              hasReachedEnd: _hasReachedEnd,
+              isLoadingMore: false,
+              apiCallCount: _apiCallCount,
+            ));
+          }
+        }
       },
     );
   }
@@ -50,9 +66,18 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
     LoadMoreNews event,
     Emitter<NewsListState> emit,
   ) async {
-    if (_isFetching || _hasReachedEnd) return;
+    final currentState = state;
+    if (currentState is! NewsListLoaded || currentState.isLoadingMore || _hasReachedEnd) return;
+
     _isFetching = true;
-    emit(NewsListLoaded(_allNews, hasReachedEnd: _hasReachedEnd, isLoadingMore: true, apiCallCount: _apiCallCount));
+    _allNews = List.from(currentState.news);
+    _apiCallCount = currentState.apiCallCount;
+    emit(NewsListLoaded(
+      _allNews,
+      hasReachedEnd: currentState.hasReachedEnd,
+      isLoadingMore: true,
+      apiCallCount: _apiCallCount,
+    ));
 
     List<News> nextPageNews;
     if (_prefetchQueue.isNotEmpty) {
@@ -69,15 +94,33 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
     final newArticles = nextPageNews.where((n) => !_allNews.any((a) => a.id == n.id)).toList();
     if (newArticles.isEmpty) {
       _hasReachedEnd = true;
+      emit(NewsListLoaded(
+        _allNews,
+        hasReachedEnd: true,
+        isLoadingMore: false,
+        apiCallCount: _apiCallCount,
+      ));
     } else {
       _allNews.addAll(newArticles);
-      if (newArticles.length < 3) _hasReachedEnd = true;
-    }
-    emit(NewsListLoaded(_allNews, hasReachedEnd: _hasReachedEnd, isLoadingMore: false, apiCallCount: _apiCallCount));
-    _isFetching = false;
+      emit(NewsListLoaded(
+        _allNews,
+        hasReachedEnd: false,
+        isLoadingMore: false,
+        apiCallCount: _apiCallCount,
+      ));
 
-    // Prefetch the next page after serving this one
-    await _prefetchNextPage();
+      // Prefetch the next page after serving this one
+      await _prefetchNextPage();
+      if (!emit.isDone) {
+        emit(NewsListLoaded(
+          _allNews,
+          hasReachedEnd: _hasReachedEnd,
+          isLoadingMore: false,
+          apiCallCount: _apiCallCount,
+        ));
+      }
+    }
+    _isFetching = false;
   }
 
   Future<void> _prefetchNextPage() async {
@@ -90,6 +133,8 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
       (news) {
         if (news.isNotEmpty) {
           _prefetchQueue.add(news);
+        } else {
+          _hasReachedEnd = true;
         }
       },
     );

@@ -171,6 +171,13 @@ class _NewsListPageState extends State<NewsListPage> {
                               itemCount: state.news.length,
                               separatorBuilder: (context, index) => const SizedBox(height: 8),
                               itemBuilder: (context, index) {
+                                if (index >= state.news.length) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      key: Key('loading_more_indicator'),
+                                    ),
+                                  );
+                                }
                                 final news = state.news[index];
                                 return GestureDetector(
                                   onTap: () {
